@@ -29,8 +29,7 @@ public class ResourcesController : Controller
         _env = env;
     }
 
-    // GET: /Resources/Add/{groupId}
-    [HttpGet]
+    // GET: /Resources/Add/{groupId}[HttpGet]
     public async Task<IActionResult> Add(Guid id)
     {
         var userId = _userManager.GetUserId(User);
@@ -38,13 +37,13 @@ public class ResourcesController : Controller
 
         var isPlatformAdmin = User.IsInRole("PlatformAdmin");
 
-        // Security Check: Ensure the user is a member OR a Platform Admin
-        var isMember = await _context.GroupMembers
-            .AnyAsync(m => m.StudyGroupId == id && m.UserId == userId);
+        // Security Check: Ensure the user is a Group Admin OR a Platform Admin
+        var isAdmin = await _context.GroupMembers
+            .AnyAsync(m => m.StudyGroupId == id && m.UserId == userId && m.Role == "Admin");
 
-        if (!isMember && !isPlatformAdmin)
+        if (!isAdmin && !isPlatformAdmin)
         {
-            return RedirectToAction("Details", "Groups", new { id = id });
+            return Forbid(); // Block regular members from accessing the add resource page
         }
 
         var model = new AddResourceViewModel
@@ -79,11 +78,11 @@ public class ResourcesController : Controller
 
         var isPlatformAdmin = User.IsInRole("PlatformAdmin");
 
-        // Security Check: Double-check membership on POST
-        var isMember = await _context.GroupMembers
-            .AnyAsync(m => m.StudyGroupId == model.StudyGroupId && m.UserId == userId);
+        // Security Check: Double-check Admin status on POST
+        var isAdmin = await _context.GroupMembers
+            .AnyAsync(m => m.StudyGroupId == model.StudyGroupId && m.UserId == userId && m.Role == "Admin");
 
-        if (!isMember && !isPlatformAdmin) return Unauthorized();
+        if (!isAdmin && !isPlatformAdmin) return Forbid(); // Block unauthorized POST requests
 
         string finalUrlOrPath = string.Empty;
 
@@ -181,8 +180,7 @@ public class ResourcesController : Controller
         return View(viewModel);
     }
 
-    // POST: /Resources/Delete/{id}
-    [HttpPost, ActionName("Delete")]
+    // POST: /Resources/Delete/{id}[HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {

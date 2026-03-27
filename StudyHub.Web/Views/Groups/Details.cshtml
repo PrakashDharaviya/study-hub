@@ -39,9 +39,6 @@
                 </div>
 
                 <div class="text-md-end">
-                    <!-- ========================================== -->
-                    <!--          FIXED AUTHORIZATION LOGIC         -->
-                    <!-- ========================================== -->
                     <div class="d-flex flex-column flex-sm-row gap-2 align-items-md-end justify-content-md-end">
                         
                         @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin)
@@ -96,7 +93,9 @@
                 <div class="neu-card">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="text-accent-dark mb-0">Shared Resources</h3>
-                        @if (Model.IsCurrentUserMember || Model.IsPlatformAdmin)
+                        
+                        <!-- FIX: Only Group Admins or Platform Admins can add resources -->
+                        @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin)
                         {
                             <a asp-controller="Resources" asp-action="Add" asp-route-id="@Model.Id" class="neu-btn py-2 px-3" style="font-size: 0.85rem; text-decoration: none;">
                                 <i data-lucide="upload" class="me-1" style="width: 16px; height: 16px;"></i> Add Resource
@@ -109,7 +108,7 @@
                         <div class="text-center py-5">
                             <i data-lucide="lock" class="mb-3" style="width: 48px; height: 48px; color: var(--text-muted);"></i>
                             <h4 class="text-accent-dark">Members Only</h4>
-                            <p style="color: var(--text-muted);">You must join this group to view and share resources.</p>
+                            <p style="color: var(--text-muted);">You must join this group to view resources.</p>
                         </div>
                     }
                     else if (!Model.Resources.Any())
@@ -117,7 +116,7 @@
                         <div class="text-center py-5">
                             <i data-lucide="file-question" class="mb-3" style="width: 48px; height: 48px; color: var(--text-muted);"></i>
                             <h4 class="text-accent-dark">No resources yet</h4>
-                            <p style="color: var(--text-muted);">Be the first to share a link or document with the group!</p>
+                            <p style="color: var(--text-muted);">The group admin hasn't shared any resources yet.</p>
                         </div>
                     }
                     else
@@ -135,17 +134,14 @@
                                         }
                                         else if (resource.Type == "PDF")
                                         {
-
                                             <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
                                         }
                                         else if (resource.Type == "Image")
                                         {
-
                                             <i data-lucide="image" style="width: 20px; height: 20px;"></i>
                                         }
                                         else
                                         {
-
                                             <i data-lucide="file" style="width: 20px; height: 20px;"></i>
                                         }
                                     </div>
@@ -172,7 +168,6 @@
                                             @(resource.Type == "Link" ? "Open Link" : "View File")
                                         </a>
                                         
-                                        <!-- FIX: Uploader OR Group Admin OR Platform Admin can delete -->
                                         @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin || resource.UploaderId == Model.CurrentUserId)
                                         {
                                             <a asp-controller="Resources" asp-action="Delete" asp-route-id="@resource.Id" class="neu-btn py-2 px-3 text-center w-100" style="font-size: 0.85rem; color: var(--danger);" title="Delete Resource">
