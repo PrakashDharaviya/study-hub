@@ -1,6 +1,63 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            
+            <!-- Back Navigation -->
+            <div class="mb-4 ps-2">
+                <a asp-controller="Home" asp-action="Index" class="text-decoration-none d-inline-flex align-items-center fw-medium" style="color: var(--text-muted); transition: color 0.2s ease;">
+                    <i data-lucide="arrow-left" class="me-2" style="width: 18px; height: 18px;"></i> Back to Home
+                </a>
+            </div>
+
+            <!-- Neumorphic Card -->
+            <div class="neu-card">
+                
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <div class="card-icon mx-auto mb-4" style="width: 64px; height: 64px;">
+                        <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <h1 class="mb-2 text-accent-dark">Privacy Policy</h1>
+                    <p style="color: var(--text-muted); font-weight: 500;">Last Updated: March 27, 2026</p>
+                </div>
+
+                <!-- Content -->
+                <div class="privacy-content" style="color: var(--text-main); line-height: 1.8; font-size: 1.05rem;">
+                    
+                    <h4 class="text-accent-dark mt-4 mb-3 fw-bold">1. Information We Collect</h4>
+                    <p class="mb-4" style="color: var(--text-muted);">
+                        At StudyHub, we collect basic profile information (such as your name and university email address) when you register for an account. We also store the data you actively share within study groups, including uploaded resources, links, and group descriptions.
+                    </p>
+
+                    <h4 class="text-accent-dark mt-4 mb-3 fw-bold">2. How We Use Your Data</h4>
+                    <p class="mb-4" style="color: var(--text-muted);">
+                        Your information is used exclusively to facilitate academic collaboration. We use your data to authenticate your account, display your profile within your joined study groups, and organize the resources you share. <strong style="color: var(--text-main);">We do not sell your personal data to third parties.</strong>
+                    </p>
+
+                    <h4 class="text-accent-dark mt-4 mb-3 fw-bold">3. Cookies and Tracking</h4>
+                    <p class="mb-4" style="color: var(--text-muted);">
+                        StudyHub uses essential cookies to maintain your logged-in session and ensure platform security. We do not use invasive third-party tracking cookies. By using our platform, you consent to the use of these essential session cookies.
+                    </p>
+
+                    <h4 class="text-accent-dark mt-4 mb-3 fw-bold">4. Data Security</h4>
+                    <p class="mb-4" style="color: var(--text-muted);">
+                        We implement industry-standard security measures to protect your academic resources and personal information. However, please remember that no method of transmission over the internet is 100% secure. We encourage you not to share highly sensitive personal information in public study groups.
+                    </p>
+
+                    <!-- Footer Note -->
+                    <div class="mt-5 pt-4 border-top text-center" style="border-color: rgba(40, 54, 24, 0.1) !important;">
+                        <p class="mb-0" style="color: var(--text-muted); font-size: 0.95rem;">
+                            If you have any questions about this Privacy Policy, please contact the StudyHub administration team.
+                        </p>
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
