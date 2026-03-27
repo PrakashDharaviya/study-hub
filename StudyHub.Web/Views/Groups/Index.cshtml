@@ -4,7 +4,8 @@
 }
 
 <div class="container py-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
             <h1 class="mb-1 text-accent-dark">Discover Groups</h1>
             <p class="mb-0" style="color: var(--text-muted); font-size: 1.05rem;">
@@ -18,6 +19,39 @@
         </div>
     </div>
 
+    <!-- Search & Filter Section -->
+    <div class="mb-5">
+        <form asp-action="Index" method="get" class="d-flex flex-column flex-md-row gap-3">
+            
+            <!-- Search Input -->
+            <div class="flex-grow-1 position-relative">
+                <i data-lucide="search" class="position-absolute top-50 translate-middle-y ms-3" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="neu-input w-100" style="padding-left: 2.8rem;" placeholder="Search by group name or topic tags..." />
+            </div>
+            
+            <!-- Semester Dropdown -->
+            <div style="min-width: 220px;">
+                <select name="semester" class="neu-input form-select w-100" asp-items="ViewBag.Semesters" style="cursor: pointer; appearance: auto;">
+                    <option value="">All Semesters</option>
+                </select>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="neu-btn px-4">Filter</button>
+                
+                <!-- Only show 'Clear' if a filter is currently applied -->
+                @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()) || !string.IsNullOrEmpty(ViewData["CurrentSemester"]?.ToString()))
+                {
+                    <a asp-action="Index" class="neu-btn px-3 d-flex align-items-center justify-content-center" title="Clear Filters">
+                        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Grid Section -->
     @if (Model.Any())
     {
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
@@ -87,9 +121,20 @@
                 <div class="card-icon mx-auto mb-4" style="width: 64px; height: 64px;">
                     <i data-lucide="search" style="width: 32px; height: 32px;"></i>
                 </div>
-                <h3 class="text-accent-dark mb-2">No groups found</h3>
-                <p class="mb-4" style="color: var(--text-muted);">Be the first to create a study group for this semester!</p>
-                <a asp-action="Create" class="neu-btn px-4 py-2">Create a Group</a>
+                
+                <!-- Dynamic Empty State Text based on active filters -->
+                @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()) || !string.IsNullOrEmpty(ViewData["CurrentSemester"]?.ToString()))
+                {
+                    <h3 class="text-accent-dark mb-2">No matches found</h3>
+                    <p class="mb-4" style="color: var(--text-muted);">Try adjusting your search terms or semester filter.</p>
+                    <a asp-action="Index" class="neu-btn px-4 py-2">Clear Filters</a>
+                }
+                else
+                {
+                    <h3 class="text-accent-dark mb-2">No groups found</h3>
+                    <p class="mb-4" style="color: var(--text-muted);">Be the first to create a study group for this semester!</p>
+                    <a asp-action="Create" class="neu-btn px-4 py-2">Create a Group</a>
+                }
             </div>
         </div>
     }

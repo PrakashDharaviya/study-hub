@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudyHub.Web.Data;
 using StudyHub.Web.Data.Entities;
@@ -10,8 +11,7 @@ namespace StudyHub.Web.Controllers;
 
 /// <summary>
 /// Manages the discovery, creation, and membership of Study Groups.
-/// </summary>
-[Authorize]
+/// </summary>[Authorize]
 public class GroupsController : Controller
 {
     private readonly StudyHubDbContext _context;
@@ -25,13 +25,30 @@ public class GroupsController : Controller
 
     // GET: /Groups
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? searchString, string? semester)
     {
         var userId = _userManager.GetUserId(User);
 
-        var groups = await _context.StudyGroups
+        // 1. Start with the base query
+        var query = _context.StudyGroups
             .Include(g => g.Members)
             .AsNoTracking()
+            .AsQueryable();
+
+        // 2. Apply Search Filter (Name or Tags)
+        if (!string.IsNullOrWhiteSpace(searchString))
+        {
+            query = query.Where(g => g.Name.Contains(searchString) || g.TopicTags.Contains(searchString));
+        }
+
+        // 3. Apply Semester Filter
+        if (!string.IsNullOrWhiteSpace(semester))
+        {
+            query = query.Where(g => g.Semester == semester);
+        }
+
+        // 4. Execute query and map to ViewModel
+        var groups = await query
             .OrderByDescending(g => g.CreatedAt)
             .Select(g => new GroupViewModel
             {
@@ -45,6 +62,19 @@ public class GroupsController : Controller
                 IsUserMember = g.Members.Any(m => m.UserId == userId)
             })
             .ToListAsync();
+
+        // 5. Populate ViewData for the UI Search Bar & Dropdown
+        ViewData["CurrentFilter"] = searchString;
+        ViewData["CurrentSemester"] = semester;
+
+        // Get distinct semesters for the dropdown filter
+        var distinctSemesters = await _context.StudyGroups
+            .Select(g => g.Semester)
+            .Distinct()
+            .OrderBy(s => s)
+            .ToListAsync();
+
+        ViewBag.Semesters = new SelectList(distinctSemesters);
 
         return View(groups);
     }
@@ -94,7 +124,8 @@ public class GroupsController : Controller
         return RedirectToAction(nameof(Details), new { id = newGroup.Id });
     }
 
-    // POST: /Groups/Join/{id}[HttpPost]
+    // POST: /Groups/Join/{id}
+    [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Join(Guid id)
     {
