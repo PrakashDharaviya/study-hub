@@ -268,4 +268,40 @@ public class GroupService : IGroupService
             })
             .ToListAsync();
     }
+
+    public async Task<bool> RemoveMemberAsync(Guid groupId, string memberIdToRemove, string currentUserId, bool isPlatformAdmin)
+    {
+        var group = await _context.StudyGroups
+            .Include(g => g.Members)
+            .FirstOrDefaultAsync(g => g.Id == groupId);
+
+        if (group == null) return false;
+
+        // Security: Only Group Admins OR Platform Admins can remove members
+        var isGroupAdmin = group.Members.Any(m => m.UserId == currentUserId && m.Role == "Admin");
+        if (!isPlatformAdmin && !isGroupAdmin) return false;
+
+        // Find the member to remove
+        var memberToRemove = group.Members.FirstOrDefault(m => m.UserId == memberIdToRemove);
+
+        // Security: Cannot remove someone who isn't a member, and cannot remove an Admin
+        if (memberToRemove == null || memberToRemove.Role == "Admin") return false;
+
+        _context.GroupMembers.Remove(memberToRemove);
+
+        // Log Activity
+        var activity = new ActivityFeed
+        {
+            StudyGroupId = groupId,
+            UserId = currentUserId,
+            Content = "A member was removed from the group.",
+            Type = "System",
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.ActivityFeeds.Add(activity);
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
 }

@@ -181,4 +181,19 @@ public class GroupsController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+    // POST: /Groups/RemoveMember
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveMember(Guid groupId, string memberId)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Challenge();
+
+        var isPlatformAdmin = User.IsInRole("PlatformAdmin");
+        var success = await _groupService.RemoveMemberAsync(groupId, memberId, userId, isPlatformAdmin);
+
+        if (!success) return Forbid(); // Either not an admin, or tried to remove another admin
+
+        return RedirectToAction(nameof(Details), new { id = groupId });
+    }
 }
