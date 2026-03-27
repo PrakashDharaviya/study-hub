@@ -42,9 +42,10 @@
                     <!-- ========================================== -->
                     <!--          FIXED AUTHORIZATION LOGIC         -->
                     <!-- ========================================== -->
-                    @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin)
-                    {
-                        <div class="d-flex flex-column flex-sm-row gap-2 align-items-md-end justify-content-md-end">
+                    <div class="d-flex flex-column flex-sm-row gap-2 align-items-md-end justify-content-md-end">
+                        
+                        @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin)
+                        {
                             <div class="d-inline-flex align-items-center px-3 py-2 rounded-3" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600;">
                                 <i data-lucide="shield" class="me-2" style="width: 18px; height: 18px;"></i> Admin Controls
                             </div>
@@ -54,22 +55,22 @@
                             <a asp-action="Delete" asp-route-id="@Model.Id" class="neu-btn py-2 px-3" style="color: var(--danger);" title="Delete Group">
                                 <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
                             </a>
-                        </div>
-                    }
-                    else if (Model.IsCurrentUserMember)
-                    {
-                        <div class="d-inline-flex align-items-center px-4 py-2 rounded-3" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600;">
-                            <i data-lucide="check-circle" class="me-2" style="width: 18px; height: 18px;"></i> Member
-                        </div>
-                    }
-                    else
-                    {
-                        <form asp-action="Join" asp-route-id="@Model.Id" method="post">
-                            <button type="submit" class="neu-btn py-2 px-4">
-                                <i data-lucide="user-plus" class="me-2" style="width: 18px; height: 18px;"></i> Join Group
-                            </button>
-                        </form>
-                    }
+                        }
+                        else if (Model.IsCurrentUserMember)
+                        {
+                            <div class="d-inline-flex align-items-center px-4 py-2 rounded-3" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600;">
+                                <i data-lucide="check-circle" class="me-2" style="width: 18px; height: 18px;"></i> Member
+                            </div>
+                        }
+                        else
+                        {
+                            <form asp-action="Join" asp-route-id="@Model.Id" method="post">
+                                <button type="submit" class="neu-btn py-2 px-4">
+                                    <i data-lucide="user-plus" class="me-2" style="width: 18px; height: 18px;"></i> Join Group
+                                </button>
+                            </form>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -171,7 +172,8 @@
                                             @(resource.Type == "Link" ? "Open Link" : "View File")
                                         </a>
                                         
-                                        @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin)
+                                        <!-- FIX: Uploader OR Group Admin OR Platform Admin can delete -->
+                                        @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin || resource.UploaderId == Model.CurrentUserId)
                                         {
                                             <a asp-controller="Resources" asp-action="Delete" asp-route-id="@resource.Id" class="neu-btn py-2 px-3 text-center w-100" style="font-size: 0.85rem; color: var(--danger);" title="Delete Resource">
                                                 <i data-lucide="trash-2" style="width: 14px; height: 14px; margin-right: 4px;"></i> Delete

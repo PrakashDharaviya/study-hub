@@ -86,7 +86,8 @@ public class GroupService : IGroupService
             CreatedAt = group.CreatedAt,
             IsCurrentUserMember = isMember,
             CurrentUserRole = currentUserMembership?.Role ?? string.Empty,
-            IsPlatformAdmin = isPlatformAdmin, // Pass the God Mode flag to the view
+            IsPlatformAdmin = isPlatformAdmin,
+            CurrentUserId = userId, // NEW: Pass the current user's ID to the view
 
             Members = group.Members.Select(m => new GroupMemberViewModel
             {
@@ -106,6 +107,7 @@ public class GroupService : IGroupService
                 Description = r.Description,
                 Type = r.Type,
                 UrlOrPath = r.UrlOrPath,
+                UploaderId = r.UploaderId, // NEW: Pass the uploader's ID to the view
                 UploaderName = $"{r.Uploader.FirstName} {r.Uploader.LastName}".Trim(),
                 CreatedAt = r.CreatedAt,
                 IsPinned = r.IsPinned

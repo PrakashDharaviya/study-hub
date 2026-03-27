@@ -24,9 +24,14 @@ public class GroupDetailViewModel
     public string CurrentUserRole { get; set; } = string.Empty;
 
     /// <summary>
-    /// NEW: Determines if the current user is a global Platform Administrator (God Mode).
+    /// Determines if the current user is a global Platform Administrator (God Mode).
     /// </summary>
     public bool IsPlatformAdmin { get; set; }
+
+    /// <summary>
+    /// NEW: The ID of the currently logged-in user. Used to determine resource ownership.
+    /// </summary>
+    public string CurrentUserId { get; set; } = string.Empty;
 
     public List<GroupMemberViewModel> Members { get; set; } = new List<GroupMemberViewModel>();
     public List<GroupResourceViewModel> Resources { get; set; } = new List<GroupResourceViewModel>();
@@ -47,6 +52,12 @@ public class GroupResourceViewModel
     public string Description { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty; // e.g., "Link", "PDF"
     public string UrlOrPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// NEW: The ID of the user who uploaded this resource.
+    /// </summary>
+    public string UploaderId { get; set; } = string.Empty;
+
     public string UploaderName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public bool IsPinned { get; set; }
