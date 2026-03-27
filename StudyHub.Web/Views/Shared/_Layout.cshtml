@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using StudyHub.Web.Data.Entities
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -9,84 +9,99 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - StudyHub</title>
-    
+
     <!-- Bootstrap 5.3 (Local) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    
-    <!-- Custom Sanzo Wada Design System -->
+
+    <!-- Earthy Minimalist Design System -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/StudyHub.Web.styles.css" asp-append-version="true" />
-    
+
     <!-- Lucide Icons (CDN) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
+
+    <!-- ===== GLASSMORPHISM NAVBAR ===== -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-4 py-3">
+        <nav class="navbar navbar-expand-sm navbar-light glass-nav py-3">
             <div class="container">
-                <a class="navbar-brand fw-bold d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
+
+                <!-- Brand -->
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <i data-lucide="library"></i> StudyHub
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <!-- Mobile Toggler -->
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    
-                    <!-- Main Navigation -->
-                    <ul class="navbar-nav flex-grow-1">
+
+                <!-- Nav Links -->
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <!-- Left: page links -->
+                    <ul class="navbar-nav flex-grow-1 ms-3">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Groups" asp-action="Index">Discover Groups</a>
+                                <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index">Discover Groups</a>
                             </li>
                         }
                     </ul>
 
-                    <!-- Authentication Navigation -->
-                    <ul class="navbar-nav">
+                    <!-- Right: auth links -->
+                    <ul class="navbar-nav align-items-center gap-2">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item d-flex align-items-center">
-                                <span class="nav-link text-muted me-3">
-                                    <i data-lucide="user" class="me-1" style="width: 18px; height: 18px;"></i>
+                            <li class="nav-item">
+                                <span class="nav-link d-flex align-items-center gap-2 pe-none" style="color: var(--text-muted);">
+                                    <i data-lucide="user" style="width:17px;height:17px;"></i>
                                     @User.Identity?.Name
                                 </span>
                             </li>
                             <li class="nav-item">
-                                <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-outline-primary btn-sm mt-1">Logout</button>
+                                <form class="m-0" asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="neu-btn py-2 px-4" style="font-size:0.88rem;">Logout</button>
                                 </form>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item me-2">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Log in</a>
+                            <li class="nav-item">
+                                <a class="nav-link fw-semibold" asp-controller="Account" asp-action="Login">Log in</a>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-primary btn-sm mt-1" asp-controller="Account" asp-action="Register">Sign up</a>
+                                <a class="neu-btn py-2 px-4" asp-controller="Account" asp-action="Register" style="font-size:0.88rem;">Sign up</a>
                             </li>
                         }
                     </ul>
-
                 </div>
+
             </div>
         </nav>
     </header>
-    
-    <div class="container">
-        <main role="main" class="pb-5">
+
+    <!-- ===== MAIN CONTENT WRAPPER (flex-grow pushes footer down) ===== -->
+    <div class="page-wrapper">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted py-4 mt-auto">
-        <div class="container text-center">
-            &copy; @DateTime.Now.Year - StudyHub - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-primary">Privacy Policy</a>
+    <!-- ===== FOOTER (always at bottom, never overlaps) ===== -->
+    <footer class="site-footer">
+        <div class="container">
+            &copy; @DateTime.Now.Year &ndash; StudyHub &ndash;
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
         </div>
     </footer>
 
@@ -94,12 +109,14 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    
-    <!-- Initialize Lucide Icons -->
+
+    <!-- Initialize Lucide Icons AFTER DOM is ready -->
     <script>
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', function () {
+            lucide.createIcons();
+        });
     </script>
-    
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

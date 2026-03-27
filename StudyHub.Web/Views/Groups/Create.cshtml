@@ -1,0 +1,75 @@
+﻿@model StudyHub.Web.Models.Groups.CreateGroupViewModel
+@{
+    ViewData["Title"] = "Create Study Group";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-grow-1 py-4 py-md-5">
+    <div class="w-100" style="max-width: 640px;">
+        
+        <!-- Back Navigation -->
+        <div class="mb-4 ps-2">
+            <a asp-action="Index" class="text-decoration-none d-inline-flex align-items-center fw-medium" style="color: var(--text-muted); transition: color 0.2s ease;">
+                <i data-lucide="arrow-left" class="me-2" style="width: 18px; height: 18px;"></i> Back to Discover
+            </a>
+        </div>
+
+        <!-- Neumorphic Card -->
+        <div class="neu-card">
+            
+            <!-- Icon + Heading -->
+            <div class="text-center mb-4">
+                <div class="card-icon">
+                    <i data-lucide="users"></i>
+                </div>
+                <h2 class="mb-1 text-accent-dark">Create Study Group</h2>
+                <p class="mb-0" style="color: var(--text-muted); font-size: 0.92rem;">
+                    Start a new community for your course or topic.
+                </p>
+            </div>
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <form asp-action="Create" method="post" novalidate>
+                
+                <!-- Group Name -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="neu-input" placeholder="e.g., Organic Chemistry 101" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="neu-input" rows="3" placeholder="What is this group about?"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- Semester & Tags Row -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6">
+                        <label asp-for="Semester" class="form-label"></label>
+                        <input asp-for="Semester" class="neu-input" placeholder="e.g., Fall 2026" />
+                        <span asp-validation-for="Semester" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <label asp-for="TopicTags" class="form-label"></label>
+                        <input asp-for="TopicTags" class="neu-input" placeholder="e.g., Science, Lab, Exams" />
+                        <span asp-validation-for="TopicTags" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="neu-btn w-100 py-3 mt-2" style="font-size: 0.97rem;">
+                    Create Group
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,45 +1,78 @@
-﻿@model StudyHub.Web.Models.Account.LoginViewModel
+@model StudyHub.Web.Models.Account.LoginViewModel
 @{
     ViewData["Title"] = "Log In";
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-8 col-lg-6 col-xl-4">
-        <div class="sh-card p-4 p-md-5">
+
+<div class="auth-wrapper">
+    <div class="w-100" style="max-width: 420px;">
+
+        <!-- Neumorphic Card -->
+        <div class="neu-card">
+
+            <!-- Icon + Heading -->
             <div class="text-center mb-4">
-                <i data-lucide="log-in" class="text-primary mb-3" style="width: 48px; height: 48px;"></i>
-                <h2 class="fw-bold">Welcome Back</h2>
-                <p class="text-muted">Log in to access your study groups.</p>
+                <div class="card-icon">
+                    <i data-lucide="log-in"></i>
+                </div>
+                <h2 class="mb-1">Welcome Back</h2>
+                <p class="mb-0" style="color: var(--text-muted); font-size: 0.92rem;">
+                    Log in to access your study groups.
+                </p>
             </div>
 
-            <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+            <!-- Validation Summary -->
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
+            <form asp-controller="Account" asp-action="Login"
+                  asp-route-returnUrl="@ViewData["ReturnUrl"]"
+                  method="post" novalidate>
+
+                <!-- Email -->
                 <div class="mb-3">
-                    <label asp-for="Email" class="form-label fw-bold"></label>
-                    <input asp-for="Email" class="form-control" placeholder="name@university.edu" />
-                    <span asp-validation-for="Email" class="text-danger small"></span>
+                    <label asp-for="Email" class="form-label">Email Address</label>
+                    <input asp-for="Email"
+                           class="neu-input"
+                           type="email"
+                           placeholder="name@university.edu"
+                           autocomplete="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
 
+                <!-- Password -->
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password"
+                           class="neu-input"
+                           type="password"
+                           placeholder="••••••••"
+                           autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Remember Me — fixed alignment with .checkbox-row -->
                 <div class="mb-4">
-                    <label asp-for="Password" class="form-label fw-bold"></label>
-                    <input asp-for="Password" class="form-control" placeholder="••••••••" />
-                    <span asp-validation-for="Password" class="text-danger small"></span>
+                    <label class="checkbox-row">
+                        <input asp-for="RememberMe" class="neu-checkbox" />
+                        <span style="color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">Remember me?</span>
+                    </label>
                 </div>
 
-                <div class="mb-4 form-check">
-                    <input asp-for="RememberMe" class="form-check-input" />
-                    <label asp-for="RememberMe" class="form-check-label text-muted"></label>
-                </div>
+                <!-- Submit -->
+                <button type="submit" class="neu-btn w-100 py-3 mb-3" style="font-size: 0.97rem;">
+                    Log In
+                </button>
 
-                <button type="submit" class="btn btn-primary w-100 py-2 mb-3">Log In</button>
+                <!-- Register link -->
+                <p class="text-center mb-0" style="font-size: 0.9rem;">
+                    <span style="color: var(--text-muted);">Don't have an account?</span>
+                    <a asp-controller="Account" asp-action="Register"
+                       class="fw-bold ms-1" style="color: var(--accent);">Sign up</a>
+                </p>
 
-                <div class="text-center">
-                    <span class="text-muted">Don't have an account?</span>
-                    <a asp-controller="Account" asp-action="Register" class="text-decoration-none fw-bold text-primary">Sign up</a>
-                </div>
             </form>
         </div>
+
     </div>
 </div>
 
