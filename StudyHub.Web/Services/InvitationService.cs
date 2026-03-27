@@ -53,7 +53,7 @@ public class InvitationService : IInvitationService
 
         // Send a notification to the invitee
         var inviter = await _userManager.FindByIdAsync(inviterId);
-        if (inviter == null) return false; // FIX: Null check added to resolve CS8602 warning
+        if (inviter == null) return false; // Null check
 
         var message = $"{inviter.FirstName} {inviter.LastName} invited you to join the group '{group.Name}'.";
         var actionUrl = $"/Invitations/Respond/{invitation.Id}";
