@@ -1,0 +1,59 @@
+﻿@model StudyHub.Web.Models.Groups.GroupResourceViewModel
+@{
+    ViewData["Title"] = "Delete Resource";
+    var groupId = ViewBag.GroupId;
+}
+
+<div class="d-flex justify-content-center align-items-center flex-grow-1 py-4 py-md-5">
+    <div class="w-100" style="max-width: 540px;">
+        
+        <!-- Back Navigation -->
+        <div class="mb-4 ps-2">
+            <a asp-controller="Groups" asp-action="Details" asp-route-id="@groupId" class="text-decoration-none d-inline-flex align-items-center fw-medium" style="color: var(--text-muted); transition: color 0.2s ease;">
+                <i data-lucide="arrow-left" class="me-2" style="width: 18px; height: 18px;"></i> Back to Group
+            </a>
+        </div>
+
+        <!-- Neumorphic Card -->
+        <div class="neu-card text-center">
+            
+            <!-- Icon + Heading -->
+            <div class="card-icon mx-auto mb-4" style="color: var(--danger);">
+                <i data-lucide="trash-2"></i>
+            </div>
+            <h2 class="mb-2 text-accent-dark">Delete Resource?</h2>
+            <p class="mb-4" style="color: var(--text-muted); font-size: 0.95rem;">
+                Are you sure you want to delete the @Model.Type.ToLower() <strong style="color: var(--text-main);">@Model.Title</strong>?
+            </p>
+
+            <!-- Resource Details Box -->
+            <div class="p-3 mb-4 rounded-3 text-start" style="background-color: rgba(40, 54, 24, 0.05); border: 1px solid rgba(40, 54, 24, 0.1);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i data-lucide="file" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                    <span class="fw-bold text-accent-dark">@Model.Title</span>
+                </div>
+                <div class="small" style="color: var(--text-muted);">
+                    Shared by @Model.UploaderName on @Model.CreatedAt.ToString("MMM dd, yyyy")
+                </div>
+            </div>
+
+            <!-- Warning Box -->
+            <div class="p-3 mb-4 rounded-3 text-start" style="background-color: rgba(192, 57, 43, 0.08); border-left: 3px solid var(--danger);">
+                <h6 class="fw-bold mb-1" style="color: var(--danger);">Warning</h6>
+                <small style="color: var(--danger);">This action cannot be undone. If this is an uploaded file, it will be permanently removed from the server to free up space.</small>
+            </div>
+
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center mt-2">
+                    <a asp-controller="Groups" asp-action="Details" asp-route-id="@groupId" class="neu-btn w-100 py-2" style="color: var(--text-muted); box-shadow: var(--shadow-in);">
+                        Cancel
+                    </a>
+                    <button type="submit" class="neu-btn w-100 py-2" style="color: var(--danger);">
+                        Yes, Delete Resource
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>

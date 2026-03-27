@@ -49,8 +49,26 @@
                     }
                     else
                     {
-                        <div class="d-inline-flex align-items-center px-4 py-2 rounded-3" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600;">
-                            <i data-lucide="check-circle" class="me-2" style="width: 18px; height: 18px;"></i> Member
+                        <!-- Admin Controls (Edit / Delete) -->
+                        <div class="d-flex flex-column flex-sm-row gap-2 align-items-md-end justify-content-md-end">
+                            @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin)
+                            {
+                                <div class="d-inline-flex align-items-center px-3 py-2 rounded-3" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600;">
+                                    <i data-lucide="shield" class="me-2" style="width: 18px; height: 18px;"></i> Admin Controls
+                                </div>
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="neu-btn py-2 px-3" title="Edit Group">
+                                    <i data-lucide="edit-3" style="width: 18px; height: 18px;"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="neu-btn py-2 px-3" style="color: var(--danger);" title="Delete Group">
+                                    <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="d-inline-flex align-items-center px-4 py-2 rounded-3" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600;">
+                                    <i data-lucide="check-circle" class="me-2" style="width: 18px; height: 18px;"></i> Member
+                                </div>
+                            }
                         </div>
                     }
                 </div>
@@ -78,16 +96,15 @@
                 <div class="neu-card">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="text-accent-dark mb-0">Shared Resources</h3>
-                        @if (Model.IsCurrentUserMember)
+                        @if (Model.IsCurrentUserMember || Model.IsPlatformAdmin)
                         {
-                            <!-- FIX: Wired up the Add Resource button -->
                             <a asp-controller="Resources" asp-action="Add" asp-route-id="@Model.Id" class="neu-btn py-2 px-3" style="font-size: 0.85rem; text-decoration: none;">
                                 <i data-lucide="upload" class="me-1" style="width: 16px; height: 16px;"></i> Add Resource
                             </a>
                         }
                     </div>
 
-                    @if (!Model.IsCurrentUserMember)
+                    @if (!Model.IsCurrentUserMember && !Model.IsPlatformAdmin)
                     {
                         <div class="text-center py-5">
                             <i data-lucide="lock" class="mb-3" style="width: 48px; height: 48px; color: var(--text-muted);"></i>
@@ -105,7 +122,6 @@
                     }
                     else
                     {
-                        <!-- FIX: Dynamic Resource List -->
                         <div class="d-flex flex-column gap-3">
                             @foreach (var resource in Model.Resources)
                             {
@@ -143,20 +159,25 @@
                                                 <span class="badge bg-transparent p-0 text-danger"><i data-lucide="pin" style="width: 14px; height: 14px; fill: currentColor;"></i></span>
                                             }
                                         </div>
-                                        <p class="small mb-2" style="color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                            @resource.Description
-                                        </p>
+                                        <p class="small mb-2" style="color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@resource.Description</p>
                                         <div class="d-flex flex-wrap align-items-center gap-3 small" style="color: var(--text-muted);">
                                             <span><i data-lucide="user" class="me-1" style="width: 12px; height: 12px;"></i> @resource.UploaderName</span>
                                             <span><i data-lucide="clock" class="me-1" style="width: 12px; height: 12px;"></i> @resource.CreatedAt.ToString("MMM dd, yyyy")</span>
                                         </div>
                                     </div>
                                     
-                                    <!-- Action Button -->
-                                    <div class="ms-sm-3 flex-shrink-0">
-                                        <a href="@resource.UrlOrPath" target="_blank" class="neu-btn py-2 px-4 w-100 text-center" style="font-size: 0.85rem;">
+                                    <!-- Action Buttons (View & Delete) -->
+                                    <div class="ms-sm-3 flex-shrink-0 d-flex flex-row flex-sm-column gap-2 mt-3 mt-sm-0">
+                                        <a href="@resource.UrlOrPath" target="_blank" class="neu-btn py-2 px-3 text-center w-100" style="font-size: 0.85rem;">
                                             @(resource.Type == "Link" ? "Open Link" : "View File")
                                         </a>
+                                        
+                                        @if (Model.CurrentUserRole == "Admin" || Model.IsPlatformAdmin)
+                                        {
+                                            <a asp-controller="Resources" asp-action="Delete" asp-route-id="@resource.Id" class="neu-btn py-2 px-3 text-center w-100" style="font-size: 0.85rem; color: var(--danger);" title="Delete Resource">
+                                                <i data-lucide="trash-2" style="width: 14px; height: 14px; margin-right: 4px;"></i> Delete
+                                            </a>
+                                        }
                                     </div>
                                 </div>
                             }

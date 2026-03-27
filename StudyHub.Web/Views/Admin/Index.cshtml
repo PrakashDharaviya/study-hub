@@ -1,0 +1,101 @@
+﻿@model StudyHub.Web.Models.Admin.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Platform Administration";
+}
+
+<div class="container py-4 py-md-5">
+    
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 56px; height: 56px; background-color: var(--bg); box-shadow: var(--shadow-out); color: var(--accent);">
+            <i data-lucide="layout-dashboard" style="width: 28px; height: 28px;"></i>
+        </div>
+        <div>
+            <h1 class="mb-1 text-accent-dark">Platform Administration</h1>
+            <p class="mb-0" style="color: var(--text-muted); font-size: 1.05rem;">
+                Overview of StudyHub system statistics and recent activity.
+            </p>
+        </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+        
+        <!-- Total Users -->
+        <div class="col">
+            <div class="neu-card text-center p-4 h-100">
+                <i data-lucide="users" class="mb-3" style="width: 36px; height: 36px; color: var(--accent);"></i>
+                <h2 class="display-5 fw-bold text-accent-dark mb-1">@Model.TotalUsers</h2>
+                <p class="mb-0 fw-medium" style="color: var(--text-muted);">Registered Students</p>
+            </div>
+        </div>
+
+        <!-- Total Groups -->
+        <div class="col">
+            <div class="neu-card text-center p-4 h-100">
+                <i data-lucide="library" class="mb-3" style="width: 36px; height: 36px; color: var(--accent);"></i>
+                <h2 class="display-5 fw-bold text-accent-dark mb-1">@Model.TotalGroups</h2>
+                <p class="mb-0 fw-medium" style="color: var(--text-muted);">Active Study Groups</p>
+            </div>
+        </div>
+
+        <!-- Total Resources -->
+        <div class="col">
+            <div class="neu-card text-center p-4 h-100">
+                <i data-lucide="folder-open" class="mb-3" style="width: 36px; height: 36px; color: var(--accent);"></i>
+                <h2 class="display-5 fw-bold text-accent-dark mb-1">@Model.TotalResources</h2>
+                <p class="mb-0 fw-medium" style="color: var(--text-muted);">Shared Resources</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Groups Section -->
+    <div class="neu-card p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-accent-dark mb-0">Recently Created Groups</h3>
+            <a asp-controller="Groups" asp-action="Index" class="neu-btn py-2 px-3" style="font-size: 0.85rem;">
+                View All
+            </a>
+        </div>
+
+        @if (!Model.RecentGroups.Any())
+        {
+            <div class="text-center py-4">
+                <p style="color: var(--text-muted);">No groups have been created yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var group in Model.RecentGroups)
+                {
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between p-3 rounded-4" style="border: 1px solid rgba(40, 54, 24, 0.1); background-color: rgba(255,255,255,0.3);">
+                        
+                        <div class="d-flex align-items-center gap-3 mb-3 mb-sm-0">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 48px; height: 48px; background-color: var(--bg); box-shadow: var(--shadow-out-sm); color: var(--accent);">
+                                <i data-lucide="users" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 text-accent-dark fw-bold">@group.Name</h6>
+                                <div class="d-flex flex-wrap align-items-center gap-3 small" style="color: var(--text-muted);">
+                                    <span><i data-lucide="calendar" class="me-1" style="width: 12px; height: 12px;"></i> @group.Semester</span>
+                                    <span><i data-lucide="user" class="me-1" style="width: 12px; height: 12px;"></i> @group.MemberCount Members</span>
+                                    <span><i data-lucide="clock" class="me-1" style="width: 12px; height: 12px;"></i> @group.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-shrink-0 ms-sm-3">
+                            <a asp-controller="Groups" asp-action="Details" asp-route-id="@group.Id" class="neu-btn py-2 px-4 w-100 text-center" style="font-size: 0.85rem;">
+                                View Group
+                            </a>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>

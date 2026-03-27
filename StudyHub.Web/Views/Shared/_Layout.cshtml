@@ -50,10 +50,28 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <!-- FIX: Removed the IsSignedIn check so this is always visible -->
+                        <!-- Always visible -->
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index">Discover Groups</a>
                         </li>
+                        
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <!-- NEW: My Groups Link for all logged-in users -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="MyGroups">My Groups</a>
+                            </li>
+
+                            <!-- SECURED: Admin Panel Link only for PlatformAdmin -->
+                            @if (User.IsInRole("PlatformAdmin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center gap-1" asp-area="" asp-controller="Admin" asp-action="Index" style="color: var(--accent);">
+                                        <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Admin
+                                    </a>
+                                </li>
+                            }
+                        }
                     </ul>
 
                     <!-- Right: auth links -->

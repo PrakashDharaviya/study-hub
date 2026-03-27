@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudyHub.Web.Data;
 using StudyHub.Web.Data.Entities;
+using StudyHub.Web.Models.Groups;
 using StudyHub.Web.Models.Resources;
 
 namespace StudyHub.Web.Controllers;
 
 /// <summary>
-/// Manages the uploading of files and sharing of links within Study Groups.
+/// Manages the uploading of files, sharing of links, and deletion of resources within Study Groups.
 /// </summary>
 [Authorize]
 public class ResourcesController : Controller
@@ -35,13 +36,14 @@ public class ResourcesController : Controller
         var userId = _userManager.GetUserId(User);
         if (userId == null) return Challenge();
 
-        // Security Check: Ensure the user is actually a member of this group
+        var isPlatformAdmin = User.IsInRole("PlatformAdmin");
+
+        // Security Check: Ensure the user is a member OR a Platform Admin
         var isMember = await _context.GroupMembers
             .AnyAsync(m => m.StudyGroupId == id && m.UserId == userId);
 
-        if (!isMember)
+        if (!isMember && !isPlatformAdmin)
         {
-            // If they aren't a member, redirect them to the group details so they can join
             return RedirectToAction("Details", "Groups", new { id = id });
         }
 
@@ -61,7 +63,6 @@ public class ResourcesController : Controller
         var userId = _userManager.GetUserId(User);
         if (userId == null) return Challenge();
 
-        // Custom Validation: Ensure they provided the correct data based on the type
         if (model.ResourceType == "Link" && string.IsNullOrWhiteSpace(model.Url))
         {
             ModelState.AddModelError("Url", "Please provide a valid URL for the link.");
@@ -76,46 +77,41 @@ public class ResourcesController : Controller
             return View(model);
         }
 
+        var isPlatformAdmin = User.IsInRole("PlatformAdmin");
+
         // Security Check: Double-check membership on POST
         var isMember = await _context.GroupMembers
             .AnyAsync(m => m.StudyGroupId == model.StudyGroupId && m.UserId == userId);
 
-        if (!isMember) return Unauthorized();
+        if (!isMember && !isPlatformAdmin) return Unauthorized();
 
         string finalUrlOrPath = string.Empty;
 
         // Handle File Upload
         if (model.ResourceType != "Link" && model.UploadedFile != null)
         {
-            // 1. Define the upload folder path
             string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "resources");
 
-            // 2. Create the directory if it doesn't exist
             if (!Directory.Exists(uploadsFolder))
             {
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            // 3. Generate a unique filename to prevent overwrites
             string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.UploadedFile.FileName);
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // 4. Save the file physically to the server
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await model.UploadedFile.CopyToAsync(fileStream);
             }
 
-            // 5. Store the relative path in the database
             finalUrlOrPath = "/uploads/resources/" + uniqueFileName;
         }
         else
         {
-            // Handle External Link
             finalUrlOrPath = model.Url!;
         }
 
-        // Create the Resource Entity
         var newResource = new Resource
         {
             StudyGroupId = model.StudyGroupId,
@@ -129,9 +125,111 @@ public class ResourcesController : Controller
         };
 
         _context.Resources.Add(newResource);
+
+        var activity = new ActivityFeed
+        {
+            StudyGroupId = model.StudyGroupId,
+            UserId = userId,
+            Content = $"Shared a new {model.ResourceType.ToLower()}: {model.Title}",
+            Type = "System",
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.ActivityFeeds.Add(activity);
+
         await _context.SaveChangesAsync();
 
-        // Redirect back to the Group Details page, specifically to the resources tab
         return RedirectToAction("Details", "Groups", new { id = model.StudyGroupId });
+    }
+
+    // GET: /Resources/Delete/{id}
+    [HttpGet]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Challenge();
+
+        var resource = await _context.Resources
+            .Include(r => r.StudyGroup)
+                .ThenInclude(g => g.Members)
+            .Include(r => r.Uploader)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (resource == null) return NotFound();
+
+        var isPlatformAdmin = User.IsInRole("PlatformAdmin");
+        var isAdmin = resource.StudyGroup.Members.Any(m => m.UserId == userId && m.Role == "Admin");
+        var isUploader = resource.UploaderId == userId;
+
+        // Security: Only Uploader, Group Admin, OR Platform Admin can delete
+        if (!isAdmin && !isUploader && !isPlatformAdmin) return Forbid();
+
+        var viewModel = new GroupResourceViewModel
+        {
+            Id = resource.Id,
+            Title = resource.Title,
+            Description = resource.Description,
+            Type = resource.Type,
+            UrlOrPath = resource.UrlOrPath,
+            UploaderName = $"{resource.Uploader.FirstName} {resource.Uploader.LastName}".Trim(),
+            CreatedAt = resource.CreatedAt,
+            IsPinned = resource.IsPinned
+        };
+
+        ViewBag.GroupId = resource.StudyGroupId;
+
+        return View(viewModel);
+    }
+
+    // POST: /Resources/Delete/{id}
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(Guid id)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Challenge();
+
+        var resource = await _context.Resources
+            .Include(r => r.StudyGroup)
+                .ThenInclude(g => g.Members)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (resource == null) return NotFound();
+
+        var isPlatformAdmin = User.IsInRole("PlatformAdmin");
+        var isAdmin = resource.StudyGroup.Members.Any(m => m.UserId == userId && m.Role == "Admin");
+        var isUploader = resource.UploaderId == userId;
+
+        // Security: Only Uploader, Group Admin, OR Platform Admin can delete
+        if (!isAdmin && !isUploader && !isPlatformAdmin) return Forbid();
+
+        var groupId = resource.StudyGroupId;
+
+        if (resource.Type != "Link" && !string.IsNullOrWhiteSpace(resource.UrlOrPath))
+        {
+            var fileName = Path.GetFileName(resource.UrlOrPath);
+            var filePath = Path.Combine(_env.WebRootPath, "uploads", "resources", fileName);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+
+        _context.Resources.Remove(resource);
+
+        var activity = new ActivityFeed
+        {
+            StudyGroupId = groupId,
+            UserId = userId,
+            Content = $"Deleted resource: {resource.Title}",
+            Type = "System",
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.ActivityFeeds.Add(activity);
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Details", "Groups", new { id = groupId });
     }
 }

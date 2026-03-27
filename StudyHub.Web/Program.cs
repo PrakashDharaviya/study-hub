@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StudyHub.Web.Data;
 using StudyHub.Web.Data.Entities;
+using StudyHub.Web.Services;
+using StudyHub.Web.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,12 +41,47 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 
-// 4. Add MVC Services
+// 4. Register Custom Application Services (Service Layer)
+builder.Services.AddScoped<IGroupService, GroupService>();
+
+// 5. Add MVC Services
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// 5. Configure the HTTP request pipeline
+// ==========================================
+// 6. ROLE SEEDING (PlatformAdmin & Default Admin)
+// ==========================================
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    // Ensure roles exist
+    string adminRole = "PlatformAdmin";
+    if (!await roleManager.RoleExistsAsync(adminRole))
+    {
+        await roleManager.CreateAsync(new IdentityRole(adminRole));
+    }
+
+    // Ensure default admin user exists
+    string adminEmail = "admin@studyhub.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
+    {
+        adminUser = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            FirstName = "System",
+            LastName = "Admin"
+        };
+        await userManager.CreateAsync(adminUser, "admin123");
+        await userManager.AddToRoleAsync(adminUser, adminRole);
+    }
+}
+
+// 7. Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();

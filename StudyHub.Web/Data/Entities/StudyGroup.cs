@@ -13,14 +13,14 @@ public class StudyGroup
 
     [Required]
     [MaxLength(100)]
-    public string Name { get; set; } = string.Empty; [MaxLength(500)]
+    public string Name { get; set; } = string.Empty;
+
+    [MaxLength(500)]
     public string Description { get; set; } = string.Empty;
 
     [MaxLength(50)]
-    public string Semester { get; set; } = string.Empty; // e.g., "Fall 2024"
-
-    [MaxLength(200)]
-    public string TopicTags { get; set; } = string.Empty; // Comma-separated list for v1
+    public string Semester { get; set; } = string.Empty; // e.g., "Fall 2026"[MaxLength(200)]
+    public string TopicTags { get; set; } = string.Empty; // Legacy comma-separated list
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -35,4 +35,14 @@ public class StudyGroup
     /// The shared resources (files, links, notes) posted in this group.
     /// </summary>
     public virtual ICollection<Resource> Resources { get; set; } = new List<Resource>();
+
+    /// <summary>
+    /// The relational tags assigned to this group.
+    /// </summary>
+    public virtual ICollection<GroupTag> GroupTags { get; set; } = new List<GroupTag>();
+
+    /// <summary>
+    /// The activity feed events associated with this group.
+    /// </summary>
+    public virtual ICollection<ActivityFeed> ActivityFeeds { get; set; } = new List<ActivityFeed>();
 }

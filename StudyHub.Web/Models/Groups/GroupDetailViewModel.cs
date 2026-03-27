@@ -19,9 +19,14 @@ public class GroupDetailViewModel
     public bool IsCurrentUserMember { get; set; }
 
     /// <summary>
-    /// "Admin" or "Member". Used to show/hide administrative buttons.
+    /// "Admin" or "Member". Used to show/hide administrative buttons for the group creator.
     /// </summary>
     public string CurrentUserRole { get; set; } = string.Empty;
+
+    /// <summary>
+    /// NEW: Determines if the current user is a global Platform Administrator (God Mode).
+    /// </summary>
+    public bool IsPlatformAdmin { get; set; }
 
     public List<GroupMemberViewModel> Members { get; set; } = new List<GroupMemberViewModel>();
     public List<GroupResourceViewModel> Resources { get; set; } = new List<GroupResourceViewModel>();

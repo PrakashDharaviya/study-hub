@@ -1,0 +1,48 @@
+﻿@model StudyHub.Web.Models.Groups.CreateGroupViewModel
+@{
+    ViewData["Title"] = "Delete Study Group";
+    var groupId = ViewBag.GroupId;
+}
+
+<div class="d-flex justify-content-center align-items-center flex-grow-1 py-4 py-md-5">
+    <div class="w-100" style="max-width: 540px;">
+        
+        <!-- Back Navigation -->
+        <div class="mb-4 ps-2">
+            <a asp-action="Details" asp-route-id="@groupId" class="text-decoration-none d-inline-flex align-items-center fw-medium" style="color: var(--text-muted); transition: color 0.2s ease;">
+                <i data-lucide="arrow-left" class="me-2" style="width: 18px; height: 18px;"></i> Back to Group
+            </a>
+        </div>
+
+        <!-- Neumorphic Card -->
+        <div class="neu-card text-center">
+            
+            <!-- Icon + Heading -->
+            <div class="card-icon mx-auto mb-4" style="color: var(--danger);">
+                <i data-lucide="alert-triangle"></i>
+            </div>
+            <h2 class="mb-2 text-accent-dark">Delete Group?</h2>
+            <p class="mb-4" style="color: var(--text-muted); font-size: 0.95rem;">
+                Are you sure you want to delete <strong style="color: var(--text-main);">@Model.Name</strong>? This action cannot be undone and all shared resources, activity feeds, and member data will be permanently removed.
+            </p>
+
+            <!-- Warning Box -->
+            <div class="p-3 mb-4 rounded-3 text-start" style="background-color: rgba(192, 57, 43, 0.08); border-left: 3px solid var(--danger);">
+                <h6 class="fw-bold mb-1" style="color: var(--danger);">Warning</h6>
+                <small style="color: var(--danger);">This will cascade delete all associated data in the database.</small>
+            </div>
+
+            <form asp-action="Delete" asp-route-id="@groupId" method="post">
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center mt-2">
+                    <a asp-action="Details" asp-route-id="@groupId" class="neu-btn w-100 py-2" style="color: var(--text-muted); box-shadow: var(--shadow-in);">
+                        Cancel
+                    </a>
+                    <button type="submit" class="neu-btn w-100 py-2" style="color: var(--danger);">
+                        Yes, Delete Group
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
