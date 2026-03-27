@@ -80,9 +80,10 @@
                         <h3 class="text-accent-dark mb-0">Shared Resources</h3>
                         @if (Model.IsCurrentUserMember)
                         {
-                            <button class="neu-btn py-2 px-3" style="font-size: 0.85rem;">
+                            <!-- FIX: Wired up the Add Resource button -->
+                            <a asp-controller="Resources" asp-action="Add" asp-route-id="@Model.Id" class="neu-btn py-2 px-3" style="font-size: 0.85rem; text-decoration: none;">
                                 <i data-lucide="upload" class="me-1" style="width: 16px; height: 16px;"></i> Add Resource
-                            </button>
+                            </a>
                         }
                     </div>
 
@@ -104,8 +105,62 @@
                     }
                     else
                     {
-                        <!-- Resource List will go here in the next module -->
-                        <p>Resources will be displayed here.</p>
+                        <!-- FIX: Dynamic Resource List -->
+                        <div class="d-flex flex-column gap-3">
+                            @foreach (var resource in Model.Resources)
+                            {
+                                <div class="d-flex flex-column flex-sm-row align-items-sm-center p-3 rounded-4" style="border: 1px solid rgba(40, 54, 24, 0.1); background-color: rgba(255,255,255,0.3);">
+                                    
+                                    <!-- Dynamic Icon -->
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle mb-3 mb-sm-0 me-sm-4 flex-shrink-0" style="width: 48px; height: 48px; background-color: var(--bg); box-shadow: var(--shadow-out-sm); color: var(--accent);">
+                                        @if (resource.Type == "Link")
+                                        {
+                                            <i data-lucide="link" style="width: 20px; height: 20px;"></i>
+                                        }
+                                        else if (resource.Type == "PDF")
+                                        {
+
+                                            <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
+                                        }
+                                        else if (resource.Type == "Image")
+                                        {
+
+                                            <i data-lucide="image" style="width: 20px; height: 20px;"></i>
+                                        }
+                                        else
+                                        {
+
+                                            <i data-lucide="file" style="width: 20px; height: 20px;"></i>
+                                        }
+                                    </div>
+                                    
+                                    <!-- Details -->
+                                    <div class="flex-grow-1 min-w-0 mb-3 mb-sm-0">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <h6 class="mb-0 text-accent-dark fw-bold text-truncate">@resource.Title</h6>
+                                            @if (resource.IsPinned)
+                                            {
+                                                <span class="badge bg-transparent p-0 text-danger"><i data-lucide="pin" style="width: 14px; height: 14px; fill: currentColor;"></i></span>
+                                            }
+                                        </div>
+                                        <p class="small mb-2" style="color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            @resource.Description
+                                        </p>
+                                        <div class="d-flex flex-wrap align-items-center gap-3 small" style="color: var(--text-muted);">
+                                            <span><i data-lucide="user" class="me-1" style="width: 12px; height: 12px;"></i> @resource.UploaderName</span>
+                                            <span><i data-lucide="clock" class="me-1" style="width: 12px; height: 12px;"></i> @resource.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Button -->
+                                    <div class="ms-sm-3 flex-shrink-0">
+                                        <a href="@resource.UrlOrPath" target="_blank" class="neu-btn py-2 px-4 w-100 text-center" style="font-size: 0.85rem;">
+                                            @(resource.Type == "Link" ? "Open Link" : "View File")
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
                 </div>
             </div>

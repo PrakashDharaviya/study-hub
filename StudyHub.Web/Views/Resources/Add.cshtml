@@ -1,0 +1,118 @@
+﻿@model StudyHub.Web.Models.Resources.AddResourceViewModel
+@{
+    ViewData["Title"] = "Add Resource";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-grow-1 py-4 py-md-5">
+    <div class="w-100" style="max-width: 640px;">
+        
+        <!-- Back Navigation -->
+        <div class="mb-4 ps-2">
+            <a asp-controller="Groups" asp-action="Details" asp-route-id="@Model.StudyGroupId" class="text-decoration-none d-inline-flex align-items-center fw-medium" style="color: var(--text-muted); transition: color 0.2s ease;">
+                <i data-lucide="arrow-left" class="me-2" style="width: 18px; height: 18px;"></i> Back to Group
+            </a>
+        </div>
+
+        <!-- Neumorphic Card -->
+        <div class="neu-card">
+            
+            <!-- Icon + Heading -->
+            <div class="text-center mb-4">
+                <div class="card-icon">
+                    <i data-lucide="upload-cloud"></i>
+                </div>
+                <h2 class="mb-1 text-accent-dark">Share a Resource</h2>
+                <p class="mb-0" style="color: var(--text-muted); font-size: 0.92rem;">
+                    Upload a file or share a helpful link with your group.
+                </p>
+            </div>
+
+            <!-- Validation Summary -->
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <!-- CRITICAL: enctype="multipart/form-data" is required for file uploads -->
+            <form asp-action="Add" method="post" enctype="multipart/form-data" novalidate>
+                
+                <!-- Hidden field to pass the Group ID back to the controller -->
+                <input type="hidden" asp-for="StudyGroupId" />
+
+                <!-- Title -->
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="neu-input" placeholder="e.g., Chapter 4 Study Guide" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="neu-input" rows="2" placeholder="Briefly describe this resource..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- Resource Type Dropdown -->
+                <div class="mb-4">
+                    <label asp-for="ResourceType" class="form-label"></label>
+                    <select asp-for="ResourceType" class="neu-input form-select" id="resourceTypeSelect" style="cursor: pointer;">
+                        <option value="Link">External Link (URL)</option>
+                        <option value="PDF">PDF Document</option>
+                        <option value="Document">Word/Text Document</option>
+                        <option value="Image">Image</option>
+                        <option value="Note">Text Note</option>
+                    </select>
+                    <span asp-validation-for="ResourceType" class="text-danger"></span>
+                </div>
+
+                <!-- Dynamic Input: URL (Visible by default) -->
+                <div class="mb-4" id="urlInputContainer">
+                    <label asp-for="Url" class="form-label"></label>
+                    <input asp-for="Url" class="neu-input" placeholder="https://..." />
+                    <span asp-validation-for="Url" class="text-danger"></span>
+                </div>
+
+                <!-- Dynamic Input: File Upload (Hidden by default) -->
+                <div class="mb-4" id="fileInputContainer" style="display: none;">
+                    <label asp-for="UploadedFile" class="form-label"></label>
+                    <input asp-for="UploadedFile" type="file" class="neu-input form-control" style="padding: 10px 16px;" />
+                    <span asp-validation-for="UploadedFile" class="text-danger"></span>
+                    <small class="d-block mt-2" style="color: var(--text-muted);">Max file size: 10MB. Allowed types: .pdf, .docx, .png, .jpg</small>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="neu-btn w-100 py-3 mt-2" style="font-size: 0.97rem;">
+                    Share Resource
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <!-- Dynamic UI Toggle Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const typeSelect = document.getElementById("resourceTypeSelect");
+            const urlContainer = document.getElementById("urlInputContainer");
+            const fileContainer = document.getElementById("fileInputContainer");
+
+            function toggleInputs() {
+                if (typeSelect.value === "Link") {
+                    urlContainer.style.display = "block";
+                    fileContainer.style.display = "none";
+                } else {
+                    urlContainer.style.display = "none";
+                    fileContainer.style.display = "block";
+                }
+            }
+
+            // Run on load in case of validation failure re-render
+            toggleInputs();
+
+            // Run on change
+            typeSelect.addEventListener("change", toggleInputs);
+        });
+    </script>
+}

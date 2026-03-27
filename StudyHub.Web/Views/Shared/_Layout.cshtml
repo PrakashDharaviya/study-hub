@@ -50,12 +50,10 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (SignInManager.IsSignedIn(User))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index">Discover Groups</a>
-                            </li>
-                        }
+                        <!-- FIX: Removed the IsSignedIn check so this is always visible -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index">Discover Groups</a>
+                        </li>
                     </ul>
 
                     <!-- Right: auth links -->
@@ -113,7 +111,7 @@
     <!-- Initialize Lucide Icons AFTER DOM is ready -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            lucide.createIcons();
+        lucide.createIcons();
         });
     </script>
 

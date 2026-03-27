@@ -24,6 +24,7 @@ public class GroupsController : Controller
     }
 
     // GET: /Groups
+    [HttpGet]
     public async Task<IActionResult> Index()
     {
         var userId = _userManager.GetUserId(User);
@@ -49,12 +50,14 @@ public class GroupsController : Controller
     }
 
     // GET: /Groups/Create
+    [HttpGet]
     public IActionResult Create()
     {
         return View(new CreateGroupViewModel());
     }
 
-    // POST: /Groups/Create[HttpPost]
+    // POST: /Groups/Create
+    [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateGroupViewModel model)
     {
@@ -91,8 +94,7 @@ public class GroupsController : Controller
         return RedirectToAction(nameof(Details), new { id = newGroup.Id });
     }
 
-    // POST: /Groups/Join/{id}
-    [HttpPost]
+    // POST: /Groups/Join/{id}[HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Join(Guid id)
     {
@@ -123,12 +125,12 @@ public class GroupsController : Controller
     }
 
     // GET: /Groups/Details/{id}
+    [HttpGet]
     public async Task<IActionResult> Details(Guid id)
     {
         var userId = _userManager.GetUserId(User);
         if (userId == null) return Challenge();
 
-        // Fetch group with all necessary relational data
         var group = await _context.StudyGroups
             .Include(g => g.Members)
                 .ThenInclude(m => m.User)
@@ -153,7 +155,6 @@ public class GroupsController : Controller
             IsCurrentUserMember = isMember,
             CurrentUserRole = currentUserMembership?.Role ?? string.Empty,
 
-            // Map Members
             Members = group.Members.Select(m => new GroupMemberViewModel
             {
                 UserId = m.UserId,
@@ -161,11 +162,10 @@ public class GroupsController : Controller
                 Role = m.Role,
                 JoinedAt = m.JoinedAt
             })
-            .OrderByDescending(m => m.Role == "Admin") // Admins first
+            .OrderByDescending(m => m.Role == "Admin")
             .ThenBy(m => m.JoinedAt)
             .ToList(),
 
-            // Map Resources
             Resources = group.Resources.Select(r => new GroupResourceViewModel
             {
                 Id = r.Id,
@@ -177,8 +177,8 @@ public class GroupsController : Controller
                 CreatedAt = r.CreatedAt,
                 IsPinned = r.IsPinned
             })
-            .OrderByDescending(r => r.IsPinned) // Pinned first
-            .ThenByDescending(r => r.CreatedAt) // Newest first
+            .OrderByDescending(r => r.IsPinned)
+            .ThenByDescending(r => r.CreatedAt)
             .ToList()
         };
 

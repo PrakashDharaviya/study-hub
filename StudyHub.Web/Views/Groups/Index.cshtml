@@ -3,86 +3,93 @@
     ViewData["Title"] = "Discover Groups";
 }
 
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 mt-4 gap-3">
-    <div>
-        <h1 class="mb-1 text-accent-dark">Discover Groups</h1>
-        <p class="mb-0" style="color: var(--text-muted); font-size: 1.05rem;">
-            Find and join study groups for your courses.
-        </p>
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h1 class="mb-1 text-accent-dark">Discover Groups</h1>
+            <p class="mb-0" style="color: var(--text-muted); font-size: 1.05rem;">
+                Find and join study groups for your courses.
+            </p>
+        </div>
+        <div>
+            <a asp-action="Create" class="neu-btn d-inline-flex align-items-center">
+                <i data-lucide="plus" class="me-2" style="width: 18px; height: 18px;"></i> Create Group
+            </a>
+        </div>
     </div>
-    <div>
-        <a asp-action="Create" class="neu-btn d-inline-flex align-items-center">
-            <i data-lucide="plus" class="me-2" style="width: 18px; height: 18px;"></i> Create Group
-        </a>
-    </div>
-</div>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
-    @foreach (var group in Model)
+    @if (Model.Any())
     {
-        <div class="col">
-            <!-- Neumorphic Card with reduced padding for grid layout -->
-            <div class="neu-card h-100 d-flex flex-column p-4">
-                
-                <div class="mb-3">
-                    <h4 class="mb-2 text-accent-dark">@group.Name</h4>
-                    <p class="small mb-0" style="color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                        @group.Description
-                    </p>
-                </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            @foreach (var group in Model)
+            {
+                <div class="col">
+                    <!-- Neumorphic Card with reduced padding for grid layout -->
+                    <div class="neu-card h-100 d-flex flex-column p-4">
+                        
+                        <div class="mb-3">
+                            <h4 class="mb-2 text-accent-dark">@group.Name</h4>
+                            <p class="small mb-0" style="color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                @group.Description
+                            </p>
+                        </div>
 
-                <div class="mb-4 flex-grow-1">
-                    <div class="d-flex align-items-center mb-2 small" style="color: var(--text-muted);">
-                        <i data-lucide="calendar" class="me-2" style="width: 16px; height: 16px;"></i>
-                        <span class="fw-medium">@group.Semester</span>
-                    </div>
-                    <div class="d-flex align-items-center mb-3 small" style="color: var(--text-muted);">
-                        <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i>
-                        <span class="fw-medium">@group.MemberCount Members</span>
-                    </div>
+                        <div class="mb-4 flex-grow-1">
+                            <div class="d-flex align-items-center mb-2 small" style="color: var(--text-muted);">
+                                <i data-lucide="calendar" class="me-2" style="width: 16px; height: 16px;"></i>
+                                <span class="fw-medium">@group.Semester</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3 small" style="color: var(--text-muted);">
+                                <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i>
+                                <span class="fw-medium">@group.MemberCount Members</span>
+                            </div>
 
-                    @if (!string.IsNullOrWhiteSpace(group.TopicTags))
-                    {
-                        <div class="d-flex flex-wrap gap-2 mt-3">
-                            @foreach (var tag in group.TopicTags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                            @if (!string.IsNullOrWhiteSpace(group.TopicTags))
                             {
-                                <span class="badge rounded-pill" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600; padding: 0.4em 0.8em;">
-                                    @tag.Trim()
-                                </span>
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    @foreach (var tag in group.TopicTags.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        <span class="badge rounded-pill" style="background-color: rgba(96, 108, 56, 0.1); color: var(--accent); border: 1px solid rgba(96, 108, 56, 0.2); font-weight: 600; padding: 0.4em 0.8em;">
+                                            @tag.Trim()
+                                        </span>
+                                    }
+                                </div>
                             }
                         </div>
-                    }
-                </div>
 
-                <div class="mt-auto pt-3 border-top" style="border-color: rgba(40, 54, 24, 0.1) !important;">
-                    @if (group.IsUserMember)
-                    {
-                        <!-- Inset shadow to indicate already joined/active state -->
-                        <a href="#" class="neu-btn w-100 py-2" style="box-shadow: var(--shadow-in); color: var(--text-muted); background-color: transparent;">
-                            View Group
-                        </a>
-                    }
-                    else
-                    {
-                        <form asp-action="Join" asp-route-id="@group.Id" method="post">
-                            <button type="submit" class="neu-btn w-100 py-2">
-                                Join Group
-                            </button>
-                        </form>
-                    }
+                        <div class="mt-auto pt-3 border-top" style="border-color: rgba(40, 54, 24, 0.1) !important;">
+                            @if (group.IsUserMember)
+                            {
+                                <!-- Inset shadow to indicate already joined/active state -->
+                                <a asp-action="Details" asp-route-id="@group.Id" class="neu-btn w-100 py-2" style="box-shadow: var(--shadow-in); color: var(--text-muted); background-color: transparent;">
+                                    View Group
+                                </a>
+                            }
+                            else
+                            {
+                                <form asp-action="Join" asp-route-id="@group.Id" method="post">
+                                    <button type="submit" class="neu-btn w-100 py-2">
+                                        Join Group
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     }
-
-    @if (!Model.Any())
+    else
     {
-        <div class="col-12 text-center py-5">
-            <div class="neu-card d-inline-block p-5" style="max-width: 500px;">
-                <i data-lucide="search" class="mb-3" style="width: 48px; height: 48px; color: var(--text-muted);"></i>
-                <h3 class="text-accent-dark">No groups found</h3>
+        <!-- Centered Empty State -->
+        <div class="d-flex justify-content-center align-items-center py-5 mt-2">
+            <div class="neu-card text-center p-5" style="max-width: 500px; width: 100%;">
+                <div class="card-icon mx-auto mb-4" style="width: 64px; height: 64px;">
+                    <i data-lucide="search" style="width: 32px; height: 32px;"></i>
+                </div>
+                <h3 class="text-accent-dark mb-2">No groups found</h3>
                 <p class="mb-4" style="color: var(--text-muted);">Be the first to create a study group for this semester!</p>
-                <a asp-action="Create" class="neu-btn">Create a Group</a>
+                <a asp-action="Create" class="neu-btn px-4 py-2">Create a Group</a>
             </div>
         </div>
     }
