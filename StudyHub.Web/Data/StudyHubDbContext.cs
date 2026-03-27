@@ -19,10 +19,14 @@ public class StudyHubDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<GroupMember> GroupMembers { get; set; }
     public DbSet<Resource> Resources { get; set; }
 
-    // New DbSets for Schema Expansion
+    // DbSets for Schema Expansion (Phase 1)
     public DbSet<Tag> Tags { get; set; }
     public DbSet<GroupTag> GroupTags { get; set; }
     public DbSet<ActivityFeed> ActivityFeeds { get; set; }
+
+    // DbSets for Schema Expansion (Phase 7 - Access & Invitations)
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<GroupInvitation> GroupInvitations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -35,8 +39,6 @@ public class StudyHubDbContext : IdentityDbContext<ApplicationUser>
             .IsUnique();
 
         // 2. Prevent SQL Server "Multiple Cascade Paths" error for Resources
-        // If a user is deleted, we don't automatically delete their resources to preserve group history.
-        // If a group is deleted, the resources WILL be deleted (Cascade by default).
         builder.Entity<Resource>()
             .HasOne(r => r.Uploader)
             .WithMany(u => u.UploadedResources)
@@ -77,12 +79,31 @@ public class StudyHubDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(af => af.User)
             .WithMany(u => u.ActivityFeeds)
             .HasForeignKey(af => af.UserId)
-            .OnDelete(DeleteBehavior.Restrict); // Preserve activity history if user is deleted
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<ActivityFeed>()
             .HasOne(af => af.StudyGroup)
             .WithMany(g => g.ActivityFeeds)
             .HasForeignKey(af => af.StudyGroupId)
-            .OnDelete(DeleteBehavior.Cascade); // Delete feed if group is deleted
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // 6. Prevent SQL Server "Multiple Cascade Paths" error for GroupInvitations
+        builder.Entity<GroupInvitation>()
+            .HasOne(gi => gi.Invitee)
+            .WithMany(u => u.ReceivedInvitations)
+            .HasForeignKey(gi => gi.InviteeId)
+            .OnDelete(DeleteBehavior.Restrict); // Do not cascade delete if user is deleted
+
+        builder.Entity<GroupInvitation>()
+            .HasOne(gi => gi.Inviter)
+            .WithMany(u => u.SentInvitations)
+            .HasForeignKey(gi => gi.InviterId)
+            .OnDelete(DeleteBehavior.Restrict); // Do not cascade delete if user is deleted
+
+        builder.Entity<GroupInvitation>()
+            .HasOne(gi => gi.StudyGroup)
+            .WithMany(g => g.Invitations)
+            .HasForeignKey(gi => gi.StudyGroupId)
+            .OnDelete(DeleteBehavior.Cascade); // Delete invites if group is deleted
     }
 }

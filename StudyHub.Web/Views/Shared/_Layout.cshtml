@@ -1,7 +1,26 @@
 @using Microsoft.AspNetCore.Identity
 @using StudyHub.Web.Data.Entities
+@using StudyHub.Web.Services.Interfaces
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject INotificationService NotificationService
+
+@{
+    // Fetch notification summary if the user is logged in
+    int unreadCount = 0;
+    var recentNotifications = new List<StudyHub.Web.Models.Notifications.NotificationViewModel>();
+    
+    if (SignInManager.IsSignedIn(User))
+    {
+        var userId = UserManager.GetUserId(User);
+        if (userId != null)
+        {
+            var summary = await NotificationService.GetNotificationSummaryAsync(userId);
+            unreadCount = summary.UnreadCount;
+            recentNotifications = summary.RecentNotifications;
+        }
+    }
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +38,50 @@
 
     <!-- Lucide Icons (CDN) -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Custom styles for the notification dropdown */
+        .notification-dropdown {
+        width: 320px;
+        max-height: 400px;
+        overflow-y: auto;
+        border-radius: 16px;
+        box-shadow: var(--shadow-out);
+        background-color: var(--bg);
+        border: 1px solid rgba(40, 54, 24, 0.1);
+        padding: 0;
+        }
+
+        .notification-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(40, 54, 24, 0.05);
+        transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+        background-color: rgba(96, 108, 56, 0.05);
+        }
+
+        .notification-item:last-child {
+        border-bottom: none;
+        }
+
+        .notification-unread {
+        background-color: rgba(96, 108, 56, 0.08);
+        }
+
+        .notification-badge {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        font-size: 0.65rem;
+        padding: 0.25em 0.5em;
+        border-radius: 50%;
+        background-color: var(--danger);
+        color: white;
+        border: 2px solid var(--bg);
+        }
+    </style>
 </head>
 
 <body>
@@ -57,12 +120,12 @@
                         
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <!-- NEW: My Groups Link for all logged-in users -->
+                            <!-- My Groups Link -->
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="MyGroups">My Groups</a>
                             </li>
 
-                            <!-- SECURED: Admin Panel Link only for PlatformAdmin -->
+                            <!-- SECURED: Admin Panel Link -->
                             @if (User.IsInRole("PlatformAdmin"))
                             {
                                 <li class="nav-item">
@@ -75,9 +138,61 @@
                     </ul>
 
                     <!-- Right: auth links -->
-                    <ul class="navbar-nav align-items-center gap-2">
+                    <ul class="navbar-nav align-items-center gap-3">
                         @if (SignInManager.IsSignedIn(User))
                         {
+                            <!-- NEW: Notification Bell Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link position-relative d-flex align-items-center justify-content-center rounded-circle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px; background-color: rgba(96, 108, 56, 0.08); color: var(--accent);">
+                                    <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+                                    @if (unreadCount > 0)
+                                    {
+                                        <span class="notification-badge">@unreadCount</span>
+                                    }
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end notification-dropdown mt-2" aria-labelledby="notificationDropdown">
+                                    <li><h6 class="dropdown-header fw-bold text-accent-dark border-bottom pb-2">Notifications</h6></li>
+                                    
+                                    @if (!recentNotifications.Any())
+                                    {
+                                        <li class="text-center py-4">
+                                            <i data-lucide="bell-off" class="mb-2" style="width: 24px; height: 24px; color: var(--text-muted);"></i>
+                                            <p class="mb-0 small" style="color: var(--text-muted);">You're all caught up!</p>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        foreach (var notification in recentNotifications)
+                                        {
+                                            var isUnreadClass = notification.IsRead ? "" : "notification-unread";
+                                            <li>
+                                                <a class="dropdown-item notification-item @isUnreadClass" href="@(notification.ActionUrl ?? "#")" style="white-space: normal;">
+                                                    <div class="d-flex gap-2">
+                                                        <div class="flex-shrink-0 mt-1" style="color: var(--accent);">
+                                                            @if (notification.Type == "GroupInvite")
+                                                            {
+                                                                <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
+                                                            }
+                                                            else
+                                                            {
+
+                                                                <i data-lucide="info" style="width: 16px; height: 16px;"></i>
+                                                            }
+                                                        </div>
+                                                        <div>
+                                                            <p class="mb-1 small" style="color: var(--text-main); line-height: 1.3;">@notification.Message</p>
+                                                            <small style="color: var(--text-muted); font-size: 0.75rem;">@notification.TimeAgo</small>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        }
+                                        <li><hr class="dropdown-divider m-0"></li>
+                                        <li><a class="dropdown-item text-center small py-2 text-accent fw-medium" href="#">View all notifications</a></li>
+                                    }
+                                </ul>
+                            </li>
+
                             <li class="nav-item">
                                 <span class="nav-link d-flex align-items-center gap-2 pe-none" style="color: var(--text-muted);">
                                     <i data-lucide="user" style="width:17px;height:17px;"></i>

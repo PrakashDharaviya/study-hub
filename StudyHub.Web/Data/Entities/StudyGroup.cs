@@ -19,7 +19,9 @@ public class StudyGroup
     public string Description { get; set; } = string.Empty;
 
     [MaxLength(50)]
-    public string Semester { get; set; } = string.Empty; // e.g., "Fall 2026"[MaxLength(200)]
+    public string Semester { get; set; } = string.Empty; // e.g., "Fall 2026"
+
+    [MaxLength(200)]
     public string TopicTags { get; set; } = string.Empty; // Legacy comma-separated list
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -45,4 +47,9 @@ public class StudyGroup
     /// The activity feed events associated with this group.
     /// </summary>
     public virtual ICollection<ActivityFeed> ActivityFeeds { get; set; } = new List<ActivityFeed>();
+
+    /// <summary>
+    /// The invitations sent out for this specific group.
+    /// </summary>
+    public virtual ICollection<GroupInvitation> Invitations { get; set; } = new List<GroupInvitation>();
 }

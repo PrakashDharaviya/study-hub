@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyHub.Web.Data;
 
@@ -11,9 +12,11 @@ using StudyHub.Web.Data;
 namespace StudyHub.Web.Data.Migrations
 {
     [DbContext(typeof(StudyHubDbContext))]
-    partial class StudyHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260327224602_AddNotificationsAndInvitations")]
+    partial class AddNotificationsAndInvitations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

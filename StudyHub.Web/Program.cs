@@ -43,6 +43,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // 4. Register Custom Application Services (Service Layer)
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IInvitationService, InvitationService>();
 
 // 5. Add MVC Services
 builder.Services.AddControllersWithViews();
