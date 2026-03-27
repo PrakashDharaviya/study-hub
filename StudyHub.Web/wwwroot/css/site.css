@@ -1,0 +1,108 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..1000;1,9..40,400..1000&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+:root {
+    /* Sanzo Wada Minimalist Academic Palette */
+    --sh-bg-primary: #F5F0E8; /* Warm Ivory - Main Background */
+    --sh-accent-primary: #5C7A5C; /* Sage Green - Primary Actions */
+    --sh-accent-secondary: #A3785A; /* Terracotta - Tags/Highlights */
+    --sh-text-main: #2C2C2C; /* Charcoal - Main Text */
+    --sh-text-muted: #6B6B6B; /* Muted Text */
+    --sh-surface: #FFFFFF; /* Card/Modal Backgrounds */
+    --sh-border: #E2DCD0; /* Subtle Borders */
+    /* Typography */
+    --sh-font-heading: 'DM Serif Display', serif;
+    --sh-font-body: 'DM Sans', sans-serif;
+    --sh-font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Base Styles */
+body {
+    background-color: var(--sh-bg-primary);
+    color: var(--sh-text-main);
+    font-family: var(--sh-font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-bottom: 60px;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: var(--sh-font-heading);
+    color: var(--sh-text-main);
+    font-weight: 400;
+}
+
+/* Bootstrap Overrides */
+.btn-primary {
+    background-color: var(--sh-accent-primary);
+    border-color: var(--sh-accent-primary);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+        background-color: #4a634a !important;
+        border-color: #4a634a !important;
+        color: #ffffff !important;
+    }
+
+.btn-outline-primary {
+    color: var(--sh-accent-primary);
+    border-color: var(--sh-accent-primary);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--sh-accent-primary);
+        color: #ffffff;
+    }
+
+.text-primary {
+    color: var(--sh-accent-primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--sh-accent-primary) !important;
+}
+
+/* Custom StudyHub Components */
+.sh-card {
+    background-color: var(--sh-surface);
+    border: 1px solid var(--sh-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .sh-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+.sh-tag {
+    background-color: rgba(163, 120, 90, 0.1);
+    color: var(--sh-accent-secondary);
+    font-family: var(--sh-font-mono);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid rgba(163, 120, 90, 0.2);
+    display: inline-block;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border: 1px solid var(--sh-border);
+    background-color: var(--sh-surface);
+    color: var(--sh-text-main);
+    border-radius: 6px;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--sh-accent-primary);
+        box-shadow: 0 0 0 0.25rem rgba(92, 122, 92, 0.25);
+    }
+
+/* Utilities */
+.text-muted {
+    color: var(--sh-text-muted) !important;
+}

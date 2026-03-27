@@ -1,0 +1,30 @@
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+
+namespace StudyHub.Web.Data.Entities;
+
+/// <summary>
+/// Represents a registered student/user in the StudyHub platform.
+/// Extends the base ASP.NET Core IdentityUser.
+/// </summary>
+public class ApplicationUser : IdentityUser
+{
+    public string FirstName { get; set; } = string.Empty;
+
+    public string LastName { get; set; } = string.Empty;
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Navigation Properties
+
+    /// <summary>
+    /// The study groups this user is a member of.
+    /// </summary>
+    public virtual ICollection<GroupMember> GroupMemberships { get; set; } = new List<GroupMember>();
+
+    /// <summary>
+    /// The resources (files/links) this user has uploaded across all groups.
+    /// </summary>
+    public virtual ICollection<Resource> UploadedResources { get; set; } = new List<Resource>();
+}
