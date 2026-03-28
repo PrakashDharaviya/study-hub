@@ -15,19 +15,21 @@ public class InvitationsController : Controller
     private readonly IInvitationService _invitationService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IGroupService _groupService;
+    private readonly INotificationService _notificationService;
 
     public InvitationsController(
         IInvitationService invitationService,
         UserManager<ApplicationUser> userManager,
-        IGroupService groupService)
+        IGroupService groupService,
+        INotificationService notificationService)
     {
         _invitationService = invitationService;
         _userManager = userManager;
         _groupService = groupService;
+        _notificationService = notificationService;
     }
 
-    // POST: /Invitations/Send
-    [HttpPost]
+    // POST: /Invitations/Send[HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Send(Guid groupId, string inviteeEmail)
     {
@@ -48,8 +50,6 @@ public class InvitationsController : Controller
 
         if (!success)
         {
-            // For a production app, we would return a specific error message (e.g., "User not found" or "Already a member")
-            // For the hackathon MVP, we will simply redirect back to the details page
             TempData["InviteError"] = "Could not send invitation. User not found or already invited.";
         }
         else
@@ -58,6 +58,31 @@ public class InvitationsController : Controller
         }
 
         return RedirectToAction("Details", "Groups", new { id = groupId });
+    }
+
+    // GET: /Invitations/Respond/{id}
+    [HttpGet]
+    public async Task<IActionResult> Respond(Guid id)
+    {
+        var userId = _userManager.GetUserId(User);
+        if (userId == null) return Challenge();
+
+        // Fetch all pending invites for this user
+        var pendingInvites = await _invitationService.GetPendingInvitationsAsync(userId);
+
+        // Find the specific invite they clicked on
+        var invite = pendingInvites.FirstOrDefault(i => i.InvitationId == id);
+
+        if (invite == null)
+        {
+            // If the invite doesn't exist or was already answered, redirect to home
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Mark all notifications as read since they are checking their inbox
+        await _notificationService.MarkAllAsReadAsync(userId);
+
+        return View(invite);
     }
 
     // POST: /Invitations/Accept/{id}
@@ -74,8 +99,7 @@ public class InvitationsController : Controller
         return RedirectToAction("MyGroups", "Groups");
     }
 
-    // POST: /Invitations/Decline/{id}
-    [HttpPost]
+    // POST: /Invitations/Decline/{id}[HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Decline(Guid id)
     {
